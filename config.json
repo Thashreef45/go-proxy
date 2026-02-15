@@ -1,0 +1,8 @@
+{
+    "listen_port": 8080,
+    "backend": "http://localhost:8001",
+    "max_idle_conns": 500,
+    "max_idle_conns_per_host": 500,
+    "flush_interval_ms": 50,
+    "idle_conn_timeout_sec": 60
+}

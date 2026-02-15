@@ -6,7 +6,7 @@ It forwards incoming HTTP requests to a backend server and streams responses eff
 
 ## Current Features
 
-- Reverse proxy to a single backend URL (`http://localhost:8000`)
+- Reverse proxy to a backend defined in `config.json`
 - Connection pooling with configurable idle connections
 - Error handling for backend failures
 - Response streaming with configurable flush interval
@@ -14,12 +14,18 @@ It forwards incoming HTTP requests to a backend server and streams responses eff
 ## Requirements
 
 - Go 1.20+ (or latest stable)
-- A backend server to proxy requests to (e.g., `localhost:8000`)
+- A backend server to proxy requests to
 
-## Getting Started
+## Configuration
 
-1. Clone the repository:
+The proxy uses a JSON configuration file (`config.json`) for setup. Example:
 
-```bash
-git clone https://github.com/Thashreef45/go-proxy.git
-cd go-proxy
+```json
+{
+    "listen_port": 8080,
+    "backend": "http://localhost:8001",
+    "max_idle_conns": 500,
+    "max_idle_conns_per_host": 500,
+    "flush_interval_ms": 50,
+    "idle_conn_timeout_sec": 60
+}
