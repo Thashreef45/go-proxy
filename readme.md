@@ -29,6 +29,7 @@ The proxy uses a JSON configuration file (`config.json`) for setup. Example:
     "flush_interval_ms": 50,
     "idle_conn_timeout_sec": 60
 }
+```
 
 ## License
 
