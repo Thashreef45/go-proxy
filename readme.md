@@ -29,3 +29,9 @@ The proxy uses a JSON configuration file (`config.json`) for setup. Example:
     "flush_interval_ms": 50,
     "idle_conn_timeout_sec": 60
 }
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+

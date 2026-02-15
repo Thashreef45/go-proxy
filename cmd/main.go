@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Thashreef
+// Licensed under the MIT License. See LICENSE file for details.
+
 package main
 
 import (
