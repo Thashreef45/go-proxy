@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	"github.com/Thashreef45/proxy-server/app/handler"
+	"github.com/Thashreef45/proxy-server/app/middleware"
 	"github.com/Thashreef45/proxy-server/internal/model"
 )
 
@@ -28,10 +29,14 @@ func NewServer(cfg model.Config) (*Server, error) {
 	}, nil
 }
 
-func (s *Server) Start(listenPort int) {
-	httpListen := ":" + strconv.Itoa(listenPort)
-	fmt.Println("Proxy server started running on :", listenPort)
-	err := http.ListenAndServe(httpListen, s.handler)
+func (s *Server) Start(cfg model.Config) {
+	httpListen := ":" + strconv.Itoa(cfg.ListenPort)
+	fmt.Println("Proxy server started running on :", cfg.ListenPort)
+
+	//middleware wrappers
+	wrappedHandler := middleware.CORSMiddleware(cfg.CORS, s.handler)
+
+	err := http.ListenAndServe(httpListen, wrappedHandler)
 	if err != nil {
 		fmt.Println("Error starting server :", err)
 	}
@@ -51,5 +56,22 @@ func InitConfig() (model.Config, error) {
 		return cfg, err
 	}
 
+	if err = validateConfig(cfg); err != nil {
+		return cfg, err
+	}
+
 	return cfg, nil
+}
+
+func validateConfig(c model.Config) error {
+	if c.ListenPort <= 0 || c.ListenPort > 65535 {
+		return fmt.Errorf("invalid ListenPort: %d", c.ListenPort)
+	}
+	if c.Backend == "" {
+		return fmt.Errorf("backend URL cannot be empty")
+	}
+	if c.MaxIdleConns < 0 || c.MaxIdleConnsPerHost < 0 || c.IdleConnTimeoutSec < 0 {
+		return fmt.Errorf("connection pool values cannot be negative")
+	}
+	return nil
 }
