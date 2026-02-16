@@ -1,4 +1,4 @@
-// Copyright (c) 2026 Thashreef
+// Copyright (c) 2026 Thashreef45
 // Licensed under the MIT License. See LICENSE file for details.
 
 package main
@@ -23,5 +23,5 @@ func main() {
 		return
 	}
 
-	server.Start(cfg.ListenPort)
+	server.Start(cfg)
 }
