@@ -6,7 +6,7 @@ package main
 import (
 	"log"
 
-	"github.com/Thashreef45/proxy-server/boot"
+	"github.com/Thashreef45/proxy-server/src/boot"
 )
 
 func main() {

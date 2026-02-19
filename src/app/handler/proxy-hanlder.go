@@ -6,7 +6,7 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/Thashreef45/proxy-server/internal/model"
+	"github.com/Thashreef45/proxy-server/src/internal/model"
 )
 
 func NewProxyHandler(cfg model.Config) (*httputil.ReverseProxy, error) {
