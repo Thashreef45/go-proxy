@@ -8,9 +8,9 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/Thashreef45/proxy-server/app/handler"
-	"github.com/Thashreef45/proxy-server/app/middleware"
-	"github.com/Thashreef45/proxy-server/internal/model"
+	"github.com/Thashreef45/proxy-server/src/app/handler"
+	"github.com/Thashreef45/proxy-server/src/app/middleware"
+	"github.com/Thashreef45/proxy-server/src/internal/model"
 )
 
 type Server struct {
@@ -34,7 +34,9 @@ func (s *Server) Start(cfg model.Config) {
 	fmt.Println("Proxy server started running on :", cfg.ListenPort)
 
 	//middleware wrappers
+	logger := middleware.NewLogger(cfg.Log)
 	wrappedHandler := middleware.CORSMiddleware(cfg.CORS, s.handler)
+	wrappedHandler = logger.Handler(wrappedHandler)
 
 	err := http.ListenAndServe(httpListen, wrappedHandler)
 	if err != nil {

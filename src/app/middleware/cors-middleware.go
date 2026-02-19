@@ -3,7 +3,7 @@ package middleware
 import (
 	"net/http"
 
-	"github.com/Thashreef45/proxy-server/internal/model"
+	"github.com/Thashreef45/proxy-server/src/internal/model"
 )
 
 func CORSMiddleware(corsCfg model.CorsConfig, next http.Handler) http.Handler {
