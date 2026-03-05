@@ -56,7 +56,7 @@ func NewLogger(cfg model.LogConfig) *Logger {
 	}
 
 	// spawn log keeper goroutines
-	for range workerCount {
+	for i := 0; i < workerCount; i++ {
 		go l.logKeeper()
 	}
 
