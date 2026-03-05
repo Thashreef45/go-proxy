@@ -106,6 +106,7 @@ func (this *LRUCache) refillBucket(ip string) {
 		if this.Cache[ip].Tokens > this.MaxTokens {
 			this.Cache[ip].Tokens = this.MaxTokens
 		}
+		// Update LastVisit only when tokens are actually added
+		this.Cache[ip].LastVisit = currentTime
 	}
-	this.Cache[ip].LastVisit = currentTime
 }
