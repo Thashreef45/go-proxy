@@ -1,6 +1,8 @@
 package ratelimiter
 
-import "time"
+import (
+	"time"
+)
 
 // LRU Cache with token bucket rate limiter
 func NewLRUCache(capacity, maxTokens, refillRate int) *LRUCache {
@@ -80,9 +82,9 @@ func (this *LRUCache) attachToHead(node *Bucket) {
 	headNext := head.Next
 
 	node.Prev = head
+	node.Next = headNext
 	head.Next = node
 	headNext.Prev = node
-	node.Next = headNext
 }
 
 func (this *LRUCache) detachBucket(node *Bucket) {
@@ -93,7 +95,9 @@ func (this *LRUCache) detachBucket(node *Bucket) {
 }
 
 func (this *LRUCache) decrementToken(ip string) {
-	this.Cache[ip].Tokens--
+	if this.Cache[ip].Tokens > 0 {
+		this.Cache[ip].Tokens--
+	}
 }
 
 func (this *LRUCache) refillBucket(ip string) {
