@@ -6,6 +6,11 @@ import (
 
 // LRU Cache with token bucket rate limiter
 func NewLRUCache(capacity, maxTokens, refillRate int) *LRUCache {
+
+	/*capacity - maximum number of buckets (IPs) to store*/
+	/*maxTokens - maximum tokens in each bucket*/
+	/*refillRate - number of tokens to add per second*/
+
 	head := Bucket{}
 	tail := Bucket{}
 	head.Next = &tail
@@ -49,7 +54,10 @@ func (this *LRUCache) AllowRequest(ip string) bool {
 
 func (this *LRUCache) addBucket(ip string) {
 
-	const INITIAL_TOKEN_COUNT = 10
+	INITIAL_TOKEN_COUNT := 10 // default token count
+	if this.MaxTokens < INITIAL_TOKEN_COUNT {
+		INITIAL_TOKEN_COUNT = this.MaxTokens
+	}
 
 	if node, isExist := this.Cache[ip]; isExist {
 		// node value should be updated
