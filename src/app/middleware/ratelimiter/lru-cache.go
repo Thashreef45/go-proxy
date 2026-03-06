@@ -1,9 +1,16 @@
 package ratelimiter
 
-import "time"
+import (
+	"time"
+)
 
 // LRU Cache with token bucket rate limiter
 func NewLRUCache(capacity, maxTokens, refillRate int) *LRUCache {
+
+	/*capacity - maximum number of buckets (IPs) to store*/
+	/*maxTokens - maximum tokens in each bucket*/
+	/*refillRate - number of tokens to add per second*/
+
 	head := Bucket{}
 	tail := Bucket{}
 	head.Next = &tail
@@ -47,7 +54,10 @@ func (this *LRUCache) AllowRequest(ip string) bool {
 
 func (this *LRUCache) addBucket(ip string) {
 
-	const INITIAL_TOKEN_COUNT = 10
+	INITIAL_TOKEN_COUNT := 10 // default token count
+	if this.MaxTokens < INITIAL_TOKEN_COUNT {
+		INITIAL_TOKEN_COUNT = this.MaxTokens
+	}
 
 	if node, isExist := this.Cache[ip]; isExist {
 		// node value should be updated
@@ -80,9 +90,9 @@ func (this *LRUCache) attachToHead(node *Bucket) {
 	headNext := head.Next
 
 	node.Prev = head
+	node.Next = headNext
 	head.Next = node
 	headNext.Prev = node
-	node.Next = headNext
 }
 
 func (this *LRUCache) detachBucket(node *Bucket) {
@@ -93,7 +103,9 @@ func (this *LRUCache) detachBucket(node *Bucket) {
 }
 
 func (this *LRUCache) decrementToken(ip string) {
-	this.Cache[ip].Tokens--
+	if this.Cache[ip].Tokens > 0 {
+		this.Cache[ip].Tokens--
+	}
 }
 
 func (this *LRUCache) refillBucket(ip string) {
@@ -106,6 +118,7 @@ func (this *LRUCache) refillBucket(ip string) {
 		if this.Cache[ip].Tokens > this.MaxTokens {
 			this.Cache[ip].Tokens = this.MaxTokens
 		}
+		// Update LastVisit only when tokens are actually added
+		this.Cache[ip].LastVisit = currentTime
 	}
-	this.Cache[ip].LastVisit = currentTime
 }
