@@ -10,6 +10,7 @@ import (
 
 	"github.com/Thashreef45/proxy-server/src/app/handler"
 	"github.com/Thashreef45/proxy-server/src/app/middleware"
+	"github.com/Thashreef45/proxy-server/src/app/middleware/ratelimiter"
 	"github.com/Thashreef45/proxy-server/src/internal/model"
 )
 
@@ -34,9 +35,18 @@ func (s *Server) Start(cfg model.Config) {
 	fmt.Println("Proxy server started running on :", cfg.ListenPort)
 
 	//middleware wrappers
-	logger := middleware.NewLogger(cfg.Log)
 	wrappedHandler := middleware.CORSMiddleware(cfg.CORS, s.handler)
+
+	// logger middleware
+	logger := middleware.NewLogger(cfg.Log)
 	wrappedHandler = logger.Handler(wrappedHandler)
+
+	// setup lru cache for rate limiter
+	const userCapacity = 100_000
+	const MaxtokensPerBucket = 50
+	const refillPerSecond = 5
+	lru := ratelimiter.NewLRUCache(userCapacity, MaxtokensPerBucket, refillPerSecond)
+	wrappedHandler = ratelimiter.RateLimiter(lru, wrappedHandler)
 
 	err := http.ListenAndServe(httpListen, wrappedHandler)
 	if err != nil {

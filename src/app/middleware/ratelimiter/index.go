@@ -1,13 +1,17 @@
 package ratelimiter
 
 import (
+	"net"
 	"net/http"
 )
 
-func RateLimiter(l *LRUCache, next http.HandlerFunc) http.Handler {
+func RateLimiter(l *LRUCache, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		ip := r.RemoteAddr
+		ip, _, err := net.SplitHostPort(r.RemoteAddr)
+		if err != nil {
+			ip = r.RemoteAddr
+		}
 
 		if !l.AllowRequest(ip) {
 			w.WriteHeader(http.StatusTooManyRequests)
