@@ -10,6 +10,7 @@ import (
 
 	"github.com/Thashreef45/proxy-server/src/app/handler"
 	"github.com/Thashreef45/proxy-server/src/app/middleware"
+	"github.com/Thashreef45/proxy-server/src/app/middleware/cache"
 	"github.com/Thashreef45/proxy-server/src/app/middleware/ratelimiter"
 	"github.com/Thashreef45/proxy-server/src/internal/model"
 )
@@ -48,6 +49,12 @@ func (s *Server) Start(cfg model.Config) {
 	lru := ratelimiter.NewLRUCache(userCapacity, MaxtokensPerBucket, refillPerSecond)
 	wrappedHandler = ratelimiter.RateLimiter(lru, wrappedHandler)
 
+	// cache setup
+	if len(cfg.Cache.Routes) > 0 {
+		c := cache.NewCache(cfg.Cache.Capacity)
+		wrappedHandler = cache.CacheHandler(c, cfg.Cache, wrappedHandler)
+	}
+
 	err := http.ListenAndServe(httpListen, wrappedHandler)
 	if err != nil {
 		fmt.Println("Error starting server :", err)
@@ -84,6 +91,9 @@ func validateConfig(c model.Config) error {
 	}
 	if c.MaxIdleConns < 0 || c.MaxIdleConnsPerHost < 0 || c.IdleConnTimeoutSec < 0 {
 		return fmt.Errorf("connection pool values cannot be negative")
+	}
+	if len(c.Cache.Routes) > 0 && c.Cache.Capacity < 1 {
+		return fmt.Errorf("cache capacity must be at least 1 when cache routes are configured")
 	}
 	return nil
 }
