@@ -78,9 +78,9 @@ func TestAllowRequest(t *testing.T) {
 
 func TestRateLimiterMiddleware(t *testing.T) {
 	cache := NewLRUCache(10, 2, 1)
-	handler := RateLimiter(cache, func(w http.ResponseWriter, r *http.Request) {
+	handler := RateLimiter(cache, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("OK"))
-	})
+	}))
 
 	req := httptest.NewRequest("GET", "/", nil)
 	rec := httptest.NewRecorder()
